@@ -19,18 +19,24 @@ app.get("/blog", (req, res) =>{  // creating get api
     });
 });
 
-app.post("/blog", (req, res) =>{ 
+app.post("/blog", async (req, res) =>{ 
 //    const faculty1 = req.body.faculty
 //    const mentor1 = req.body.mentor
 //    const course1 = req.body.course
-const {faculty, course, mentor, image} = req.body // de-structure
-console.log(mentor)
+const {faculty, course, mentor, image} = req.body; // de-structure
+console.log(req.body);
+await Blog.create({
+    faculty : faculty,
+    course : course,
+    mentor : mentor,
+    image : image
+})
     res.status(200).json({
         msg : "Post API sucessfully"
     });
 });
 
-// listen vanne method ma 3000 port number diyeko
+//3000 port number is given in listen method
 app.listen(process.env.PORT, () => {
     console.log("Your nodejs project has been started....");
      
