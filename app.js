@@ -2,6 +2,8 @@ require("dotenv").config()
 const express = require("express"); //hold express variable
 const connectDatabase = require("./database");
 const Blog = require("./model/blogModel");
+const { storage, multer } = require("./middleware/multerConfig");
+const upload = multer({storage: storage})
 const app = express(); //create function
 app.use(express.json());  // to run on json
 
@@ -19,17 +21,23 @@ app.get("/blog", (req, res) =>{  // creating get api
     });
 });
 
-app.post("/blog", async (req, res) =>{ 
+app.post("/blog", upload.single("image"), async (req, res) =>{ //api //middleware //functioncall
 //    const faculty1 = req.body.faculty
 //    const mentor1 = req.body.mentor
 //    const course1 = req.body.course
-const {faculty, course, mentor, image} = req.body; // de-structure
+const {faculty, course, mentor} = req.body;
+const filename = req.file.filename;  // multi-part
 console.log(req.body);
+if(!faculty || !course || !mentor ) {
+    return res.status(400).json({
+        msg : "Sorry..!! Please enter complete datas...."
+    })
+}
 await Blog.create({
     faculty : faculty,
     course : course,
     mentor : mentor,
-    image : image
+    image : filename,
 })
     res.status(200).json({
         msg : "Post API sucessfully"
