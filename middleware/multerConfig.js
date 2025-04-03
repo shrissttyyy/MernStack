@@ -6,7 +6,7 @@ const storage = multer.diskStorage({
 
     },
     filename : function(req, file, cb){
-        cb(null, "Shiristi-" + file.originalname); // naming the file
+        cb(null, Date.now() + "-" + file.originalname); // naming the file
     },
 
 });
