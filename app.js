@@ -2,8 +2,10 @@ require("dotenv").config()
 const express = require("express"); //hold express variable
 const connectDatabase = require("./database");
 const Blog = require("./model/blogModel");
+const fs = require("fs");
 
 const { storage, multer } = require("./middleware/multerConfig");
+const { Console } = require("console");
 const upload = multer({storage: storage})
 
 const app = express(); //create function
@@ -53,12 +55,41 @@ app.get("/blog/:id", async(req,res) => {
    // console.log(req.params.id);
    const {id} = req.params;
    const blog = await Blog.findById(id);
+   
+   if(!blog) 
+    {
+    return res.status(404).json({
+        msg: "Pelease correct your id..."
+    });
+   }
+
    res.status(200).json({
     msg: "Single Blog fetch successfully",
     data: blog,
    });
 });
 
+//deleting api
+
+app.delete("/blog/:id", async(req, res) => {
+    const {id} = req.params
+    //console.log(req.params.id);
+    const blog =  await Blog.findById(id);
+    const imageName = blog.image;
+    
+    fs.unlink(`storage/${imageName}`,(err) => {
+        if (err) {
+            console.log(err);
+        } else {
+            console.log("File deleted successfully..");
+        }
+    });
+
+    await Blog.findByIdAndDelete(id);
+    res.status(200).json({
+        msg: "Blog deleted successfully..",
+    });
+});
 
 app.use(express.static("./storage"));
 
